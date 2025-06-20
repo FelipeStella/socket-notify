@@ -7,6 +7,8 @@ import { Trash2 as DeleteIcon } from "lucide-react";
 interface NotificationDrawerProps {
   position?: "right" | "left";
   optionsSocket?: UseNotificationOptions;
+  onNotificationRead?: (id: any) => void;
+  onNotificationDeleted?: (id: any) => void;
 }
 
 const drawerWrapperStyle: React.CSSProperties = {
@@ -104,9 +106,17 @@ function NotificationDrawer(props: NotificationDrawerProps) {
       newOpenItems.delete(id);
     } else {
       newOpenItems.add(id);
-      if (!isRead) markAsRead(id);
+      if (!isRead) {
+        markAsRead(id);
+        props.onNotificationRead?.(id); // 👈 callback externo
+      }
     }
     setOpenItems(newOpenItems);
+  };
+
+  const handleDelete = (id: string) => {
+    markAsDeleted(id);
+    props.onNotificationDeleted?.(id); // 👈 callback externo
   };
 
   return (
@@ -142,7 +152,7 @@ function NotificationDrawer(props: NotificationDrawerProps) {
                       size={18}
                       color="#bc1104"
                       style={{ cursor: "pointer" }}
-                      onClick={() => markAsDeleted(n.id)} />
+                      onClick={() => handleDelete(n.id)} />
                   </div>
                   <span style={spanTimeStyle}>{n.timestamp}</span>
                 </>

@@ -10,7 +10,10 @@ export default function App() {
   return (
     <div style={{ padding: "2rem", justifyContent: "center", alignItems: "center", display: "flex", flexDirection: "column" }}>
       <h1>📬 Playground de Notificações</h1>
-       <NotificationDrawer optionsSocket={options} />
+       <NotificationDrawer
+        optionsSocket={options}
+        onNotificationRead={(id) => console.log("🔵 Notificação lida:", id)}
+        onNotificationDeleted={(id) => console.log("🗑️ Notificação deletada:", id)} />
     </div>
   );
 }
