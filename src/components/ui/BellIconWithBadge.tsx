@@ -1,5 +1,25 @@
 import { Bell } from "lucide-react";
 
+const bellWrapperStyle: React.CSSProperties = {
+  position: "relative",
+  cursor: "pointer",
+};
+
+const badgeStyle: React.CSSProperties = {
+  position: "absolute",
+  top: "0.5rem", 
+  left: "0.9rem",               
+  backgroundColor: "#ef4444", 
+  color: "#ffffff",        
+  fontSize: "0.75rem",    
+  borderRadius: "9999px", 
+  width: "1.25rem",       
+  height: "1.25rem",       
+  display: "flex",         
+  alignItems: "center",    
+  justifyContent: "center" 
+};
+
 function BellIconWithBadge({
   unreadCount,
   onClick,
@@ -8,10 +28,10 @@ function BellIconWithBadge({
   onClick: () => void;
 }) {
   return (
-    <div className="relative cursor-pointer" onClick={onClick}>
+    <div style={bellWrapperStyle} onClick={onClick}>
       <Bell size={24} />
       {unreadCount > 0 && (
-        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+        <span style={badgeStyle}>
           {unreadCount}
         </span>
       )}

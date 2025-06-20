@@ -2,11 +2,71 @@ import { useState, useEffect, useRef } from "react";
 import { useNotification } from "../../hooks/useNotification";
 import BellIconWithBadge from "./BellIconWithBadge";
 import DrawerWrapper from "./DrawerWrapper";
+import { Trash2 as DeleteIcon } from "lucide-react";
+
+const drawerWrapperStyle: React.CSSProperties = {
+  position: "fixed",
+  top: 0,                  
+  width: "91%",                 
+  backgroundColor: "#ffffff",      
+  boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -4px rgba(0,0,0,0.1)", 
+  padding: "1rem",              
+  zIndex: 50,                       
+  overflowY: "auto",
+};
+
+const drawerTitleWrapperStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "1rem",
+}
+
+const drawerTitleStyle: React.CSSProperties = {
+  fontSize: "1.25rem",
+  fontWeight: "600",    
+  color: "#111827",   
+}
+
+const wrapperContentNotification: React.CSSProperties = {
+  borderBottom: "1px solid #e5e7eb",
+  paddingTop: "0.5rem",
+  paddingBottom: "0.5rem",
+};
+
+const pTitleStyle = (isRead: boolean): React.CSSProperties => ({
+  fontWeight: isRead ? "normal" : "bold",
+  fontSize: "1rem",
+  margin: 0,
+  cursor: "pointer",
+  background: "none",
+  border: "none",
+  textAlign: "left",
+  width: "100%",
+});
+
+const pDescriptionStyle: React.CSSProperties = {
+  fontSize: "0.875rem",
+  color: "#4b5563",
+  marginTop: "1rem",
+  marginLeft: "0.4rem",
+  justifyContent: "space-between",
+};
+
+const spanTimeStyle: React.CSSProperties = {
+  display: "block",
+  fontSize: "0.75rem",
+  color: "#9ca3af",
+  marginTop: "0.25rem",
+  fontStyle: "italic",
+  marginLeft: "0.4rem",
+};
 
 function NotificationDrawer() {
-  const { notifications, unreadCount, markAsRead } = useNotification();
+  const { notifications, unreadCount, markAsRead, markAsDeleted } = useNotification();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
+  const [openItems, setOpenItems] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -28,7 +88,19 @@ function NotificationDrawer() {
   }, [drawerOpen]);
 
   const handleDrawerToggle = () => {
+    if (notifications.length === 0) return;
     setDrawerOpen((prev) => !prev);
+  };
+
+  const toggleItem = (id: any, isRead: boolean) => {
+    const newOpenItems = new Set(openItems);
+    if (newOpenItems.has(id)) {
+      newOpenItems.delete(id);
+    } else {
+      newOpenItems.add(id);
+      if (!isRead) markAsRead(id);
+    }
+    setOpenItems(newOpenItems);
   };
 
   return (
@@ -38,23 +110,33 @@ function NotificationDrawer() {
       <DrawerWrapper open={drawerOpen} onClose={() => setDrawerOpen(false)}>
         <div
           ref={drawerRef}
-          className="fixed right-0 top-0 h-full w-80 bg-white shadow-lg p-4 z-50 overflow-y-auto"
+          style={drawerWrapperStyle}
         >
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-lg font-semibold">Notificações</h2>
+          <div style={drawerTitleWrapperStyle}>
+            <h2 style={drawerTitleStyle}>Notificações</h2>
           </div>
 
-          {notifications.map((n: any) => (
-            <div key={n.id} className="border-b py-2">
-              <p className="font-bold">{n.title}</p>
-              <p className="text-sm text-gray-600">{n.description}</p>
-              {!n.read && (
-                <button
-                  className="text-blue-500 text-sm mt-1"
-                  onClick={() => markAsRead(n.id)}
-                >
-                  Marcar como lida
-                </button>
+          {notifications.filter((n: any) => !n.deleted).map((n: any) => (
+            <div key={n.id} style={wrapperContentNotification}>
+              <button
+                style={pTitleStyle(n.read)}
+                onClick={() => toggleItem(n.id, n.read)}
+              >
+                {n.title}
+              </button>
+
+              {openItems.has(n.id) && (
+                <>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                    <p style={pDescriptionStyle}>{n.description}</p>
+                    <DeleteIcon
+                      size={18}
+                      color="#bc1104"
+                      style={{ cursor: "pointer" }}
+                      onClick={() => markAsDeleted(n.id)} />
+                  </div>
+                  <span style={spanTimeStyle}>{n.timestamp}</span>
+                </>
               )}
             </div>
           ))}

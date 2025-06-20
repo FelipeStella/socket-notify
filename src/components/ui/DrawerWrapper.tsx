@@ -14,7 +14,6 @@ const drawerStyle: React.CSSProperties = {
   width: "400px",
   backgroundColor: "#ffffff",
   fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue',sans-serif",
-  padding: "2rem",
   overflowY: "auto",
   backgroundSize: "16px 16px",
   zIndex: 1000,

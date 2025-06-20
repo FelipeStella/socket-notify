@@ -1,3 +1,4 @@
+import { BlobOptions } from "buffer";
 import { useEffect, useState, useCallback } from "react";
 
 export type Notification = {
@@ -7,6 +8,7 @@ export type Notification = {
   type: "info" | "success" | "error" | "warning";
   timestamp: string;
   read: boolean;
+  deleted?: boolean;
 };
 
 export function useNotification() {
@@ -29,11 +31,18 @@ export function useNotification() {
     );
   }, []);
 
-  const unreadCount = notifications.filter((n) => !n.read).length;
+  const markAsDeleted = useCallback((id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, deleted: true } : n))
+    );
+  }, []);
+
+  const unreadCount = notifications.filter((n) => !n.read && !n.deleted).length;
 
   return {
     notifications,
     unreadCount,
     markAsRead,
+    markAsDeleted
   };
 }
