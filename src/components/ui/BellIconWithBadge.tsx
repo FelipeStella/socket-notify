@@ -17,7 +17,8 @@ const badgeStyle: React.CSSProperties = {
   height: "1.25rem",       
   display: "flex",         
   alignItems: "center",    
-  justifyContent: "center" 
+  justifyContent: "center",
+  padding: "0.25rem", 
 };
 
 function BellIconWithBadge({

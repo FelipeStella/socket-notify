@@ -4,6 +4,10 @@ import BellIconWithBadge from "./BellIconWithBadge";
 import DrawerWrapper from "./DrawerWrapper";
 import { Trash2 as DeleteIcon } from "lucide-react";
 
+interface NotificationDrawerProps {
+  position?: "right" | "left";
+}
+
 const drawerWrapperStyle: React.CSSProperties = {
   position: "fixed",
   top: 0,                  
@@ -62,11 +66,12 @@ const spanTimeStyle: React.CSSProperties = {
   marginLeft: "0.4rem",
 };
 
-function NotificationDrawer() {
+function NotificationDrawer({ position = "right" }: NotificationDrawerProps) {
   const { notifications, unreadCount, markAsRead, markAsDeleted } = useNotification();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [openItems, setOpenItems] = useState<Set<number>>(new Set());
+  const bellRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!drawerOpen) return;
@@ -104,10 +109,13 @@ function NotificationDrawer() {
   };
 
   return (
-    <div className="relative">
+    <div ref={bellRef} style={{ position: "relative" }}>
       <BellIconWithBadge unreadCount={unreadCount} onClick={handleDrawerToggle} />
 
-      <DrawerWrapper open={drawerOpen} onClose={() => setDrawerOpen(false)}>
+      <DrawerWrapper
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        position={position}>
         <div
           ref={drawerRef}
           style={drawerWrapperStyle}

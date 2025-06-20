@@ -1,4 +1,3 @@
-import { BlobOptions } from "buffer";
 import { useEffect, useState, useCallback } from "react";
 
 export type Notification = {
