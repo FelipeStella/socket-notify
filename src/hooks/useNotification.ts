@@ -18,6 +18,53 @@ export interface UseNotificationOptions {
   onClose?: () => void;
 }
 
+export function isValidNotification(obj: any): obj is Notification {
+  if (typeof obj !== "object" || obj === null) {
+    console.warn("❌ Notificação inválida. Esperado: objeto, recebido:", obj);
+    logExpectedStructure();
+    return false;
+  }
+
+  const hasAllKeys = [
+    "id",
+    "title",
+    "description",
+    "type",
+    "timestamp",
+    "read",
+    "deleted",
+  ].every((key) => Object.prototype.hasOwnProperty.call(obj, key));
+
+  const isValid =
+    hasAllKeys &&
+    typeof obj.id === "string" &&
+    typeof obj.title === "string" &&
+    typeof obj.description === "string" &&
+    ["info", "success", "error", "warning"].includes(obj.type) &&
+    typeof obj.timestamp === "string" &&
+    typeof obj.read === "boolean" &&
+    typeof obj.deleted === "boolean";
+
+  if (!isValid) {
+    console.warn("❌ Estrutura de notificação inválida:", obj);
+    logExpectedStructure();
+  }
+
+  return isValid;
+}
+function logExpectedStructure() {
+  console.info("📦 Estrutura esperada da notificação:");
+  console.table({
+    id: "string",
+    title: "string",
+    description: "string",
+    type: `"info" | "success" | "error" | "warning"`,
+    timestamp: "string (ISO ou legível)",
+    read: "boolean",
+    deleted: "boolean",
+  });
+}
+
 export function useNotification(options?: UseNotificationOptions) {
   const {
     socketUrl = "ws://localhost:4000",
@@ -41,8 +88,18 @@ export function useNotification(options?: UseNotificationOptions) {
     };
 
     ws.onmessage = (event) => {
-      const newNotification: Notification = JSON.parse(event.data);
-      setNotifications((prev) => [newNotification, ...prev]);
+      try {
+        const data = JSON.parse(event.data);
+
+        if (!isValidNotification(data)) {
+          console.warn("❌ Notificação com estrutura inválida:", data);
+          return;
+        }
+
+        setNotifications((prev) => [data, ...prev]);
+      } catch (err) {
+        console.error("Erro ao processar notificação:", err);
+      }
     };
 
     ws.onerror = (error) => {
