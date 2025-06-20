@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
-import { useNotification } from "../../hooks/useNotification";
+import { useNotification, UseNotificationOptions } from "../../hooks/useNotification";
 import BellIconWithBadge from "./BellIconWithBadge";
 import DrawerWrapper from "./DrawerWrapper";
 import { Trash2 as DeleteIcon } from "lucide-react";
 
 interface NotificationDrawerProps {
   position?: "right" | "left";
+  optionsSocket?: UseNotificationOptions;
 }
 
 const drawerWrapperStyle: React.CSSProperties = {
@@ -66,8 +67,8 @@ const spanTimeStyle: React.CSSProperties = {
   marginLeft: "0.4rem",
 };
 
-function NotificationDrawer({ position = "right" }: NotificationDrawerProps) {
-  const { notifications, unreadCount, markAsRead, markAsDeleted } = useNotification();
+function NotificationDrawer(props: NotificationDrawerProps) {
+  const { notifications, unreadCount, markAsRead, markAsDeleted } = useNotification(props.optionsSocket);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const drawerRef = useRef<HTMLDivElement>(null);
   const [openItems, setOpenItems] = useState<Set<number>>(new Set());
@@ -115,7 +116,7 @@ function NotificationDrawer({ position = "right" }: NotificationDrawerProps) {
       <DrawerWrapper
         open={drawerOpen}
         onClose={() => setDrawerOpen(false)}
-        position={position}>
+        position={props.position}>
         <div
           ref={drawerRef}
           style={drawerWrapperStyle}
